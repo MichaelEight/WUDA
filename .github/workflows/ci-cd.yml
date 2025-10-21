@@ -38,10 +38,10 @@ jobs:
       - name: Run tests
         run: pytest test_app.py
         env:
-          POSTGRES_DB: dummy
-          POSTGRES_USER: dummy
-          POSTGRES_PASSWORD: dummy
-          JWT_KEY: dummy
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
           APP_PORT: 5001
 
       - name: Log in to GitHub Container Registry
@@ -91,7 +91,7 @@ jobs:
       - name: Run tests
         run: pytest test_app.py
         env:
-          SECRET_KEY: dummy
+          SECRET_KEY: ${{ secrets.FRONTEND_SECRET_KEY }}
 
       - name: Log in to GitHub Container Registry
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
