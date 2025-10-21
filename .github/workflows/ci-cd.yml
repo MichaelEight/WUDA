@@ -1,0 +1,79 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./back-end
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements_test.txt
+
+      - name: Lint with pylint
+        run: pylint **/*.py
+
+      - name: Vulnerability scan with bandit
+        run: bandit -r .
+
+      - name: Run tests
+        run: pytest test_app.py
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_HOST: localhost
+          PORT: 5432
+          JWT_KEY: test_jwt_key
+          APP_PORT: 5001
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./front-end
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements_test.txt
+
+      - name: Lint with pylint
+        run: pylint **/*.py
+
+      - name: Vulnerability scan with bandit
+        run: bandit -r .
+
+      - name: Run tests
+        run: pytest test_app.py
+        env:
+          BACKEND_HOSTNAME: localhost
+          BACKEND_PORT: 5001
+          SECRET_KEY: test_secret_key
+          SERVER_PORT: 8000

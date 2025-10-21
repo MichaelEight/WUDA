@@ -7,12 +7,13 @@ This repository contains two main applications: the back-end (server) and the fr
 ## 🖥️ Back-End Setup
 
 1. **Install dependencies:**
+
 ```bash
 cd back-end
 pip install -r requirements.txt
 ```
-2. Create .env file in backend dir with given values:
 
+2. Create .env file in backend dir with given values:
 
 ```.env
 # PostgreSQL database name
@@ -36,16 +37,20 @@ JWT_KEY=your_secret_jwt_key
 ```
 
 3. In order to run app use command
-``` bash
+
+```bash
 python3 app.py
 ```
 
 ## 🌐 Front-End Setup
 
 1. **Install dependencies:**
+
    ```bash
    cd front-end
    pip install -r requirements.txt
+
+   ```
 
 2. Create .env file
 
@@ -66,14 +71,13 @@ SERVER_PORT=8000
 
 3. Run app by following command:
 
-
 ```bash
 python3 app.py
 ```
 
 ## Database setup
-Required is postgresql. Either run given docker-compose.yaml file or provide setup for backend's `.env` file
 
+Required is postgresql. Either run given docker-compose.yaml file or provide setup for backend's `.env` file
 
 ```yaml
 services:
@@ -88,9 +92,22 @@ services:
 ```
 
 ## For students.
+
 In `tasks` directory there are clear instructions for each task that you should do in order to pass the course.
 Recommended order:
+
 1. [CICD](./tasks/CICD.md)
 2. [Kubernetes](./tasks/kubernetes.md)
 3. [Monitoring](./tasks/monitoring.md)
 
+## For MacOS
+
+- There is a permission problem when connecting to Docker to test pipeline (using act), so AI recommended using:
+
+```bash
+DOCKER_HOST=unix:///Users/michaeleight/.docker/run/docker.sock act -j backend
+```
+
+```bash
+DOCKER_HOST=unix:///Users/michaeleight/.docker/run/docker.sock act -j frontend
+```
