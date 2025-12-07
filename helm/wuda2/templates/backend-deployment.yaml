@@ -24,8 +24,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: "ghcr.io/michaeleight/wuda-backend:fix-readiness"
-          imagePullPolicy: IfNotPresent
+          image: "ghcr.io/michaeleight/wuda-backend:latest"
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 5001

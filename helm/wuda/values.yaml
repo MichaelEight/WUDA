@@ -16,8 +16,8 @@ backend:
 
   image:
     repository: ghcr.io/michaeleight/wuda-backend
-    tag: fix-readiness # includes SQLAlchemy text() wrapper fix
-    pullPolicy: IfNotPresent
+    tag: latest
+    pullPolicy: Always
 
   service:
     type: ClusterIP
