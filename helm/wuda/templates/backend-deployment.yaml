@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wuda.fullname" . }}-backend
+  labels:
+    {{- include "wuda.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "wuda.backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "wuda.backend.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: backend
+        image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.backend.service.port }}
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "wuda.fullname" . }}-config
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "wuda.fullname" . }}-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "wuda.fullname" . }}-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "wuda.fullname" . }}-config
+              key: POSTGRES_HOST
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "wuda.fullname" . }}-config
+              key: PORT
+        - name: JWT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "wuda.fullname" . }}-secret
+              key: JWT_KEY
+        - name: APP_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "wuda.fullname" . }}-config
+              key: APP_PORT_BACKEND
+        - name: APP_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "wuda.fullname" . }}-config
+              key: APP_HOST_BACKEND
+        {{- if .Values.backend.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.backend.livenessProbe.path }}
+            port: http
+          initialDelaySeconds: {{ .Values.backend.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.livenessProbe.periodSeconds }}
+        {{- end }}
+        {{- if .Values.backend.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.backend.readinessProbe.path }}
+            port: http
+          initialDelaySeconds: {{ .Values.backend.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.readinessProbe.periodSeconds }}
+        {{- end }}

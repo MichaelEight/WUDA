@@ -1,0 +1,57 @@
+frontend:
+  replicaCount: 2
+
+  image:
+    repository: ghcr.io/michaeleight/wuda-frontend
+    tag: latest
+    pullPolicy: Always
+
+  service:
+    type: NodePort
+    port: 8000
+    nodePort: 30080
+
+backend:
+  replicaCount: 2
+
+  image:
+    repository: ghcr.io/michaeleight/wuda-backend
+    tag: fix-readiness # includes SQLAlchemy text() wrapper fix
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 5001
+
+  livenessProbe:
+    enabled: true
+    path: /liveness
+    initialDelaySeconds: 10
+    periodSeconds: 10
+
+  readinessProbe:
+    enabled: true
+    path: /readiness
+    initialDelaySeconds: 5
+    periodSeconds: 5
+
+database:
+  replicaCount: 1
+
+  image:
+    repository: postgres
+    tag: "16"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 5432
+
+  env:
+    postgresDb: games
+    postgresUser: board_games
+    postgresPassword: alamakota
+
+secrets:
+  jwtKey: "your-jwt-secret-key-change-me"
+  sessionSecret: "your-session-secret-change-me"

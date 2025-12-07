@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wuda.fullname" . }}-database
+  labels:
+    {{- include "wuda.labels" . | nindent 4 }}
+    app.kubernetes.io/component: database
+spec:
+  replicas: {{ .Values.database.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "wuda.database.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "wuda.database.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: postgres
+        image: "{{ .Values.database.image.repository }}:{{ .Values.database.image.tag }}"
+        imagePullPolicy: {{ .Values.database.image.pullPolicy }}
+        ports:
+        - name: postgres
+          containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "wuda.fullname" . }}-config
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "wuda.fullname" . }}-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "wuda.fullname" . }}-secret
+              key: POSTGRES_PASSWORD

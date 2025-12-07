@@ -1,0 +1,30 @@
+apiVersion: v1
+
+kind: ConfigMap
+
+metadata:
+  name: {{ include "wuda.fullname" . }}-config
+
+  labels:
+    {{- include "wuda.labels" . | nindent 4 }}
+
+data:
+  POSTGRES_DB: {{ .Values.database.env.postgresDb | quote }}
+
+  POSTGRES_USER: {{ .Values.database.env.postgresUser | quote }}
+
+  POSTGRES_HOST: {{ include "wuda.fullname" . }}-database
+
+  PORT: {{ .Values.database.service.port | quote }}
+
+  BACKEND_HOSTNAME: {{ include "wuda.fullname" . }}-backend
+
+  BACKEND_PORT: {{ .Values.backend.service.port | quote }}
+
+  APP_PORT_BACKEND: {{ .Values.backend.service.port | quote }}
+
+  APP_HOST_BACKEND: "0.0.0.0"
+
+  APP_PORT_FRONTEND: {{ .Values.frontend.service.port | quote }}
+
+  APP_HOST_FRONTEND: "0.0.0.0"

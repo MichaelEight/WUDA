@@ -111,3 +111,83 @@ DOCKER_HOST=unix:///Users/michaeleight/.docker/run/docker.sock act -j backend
 ```bash
 DOCKER_HOST=unix:///Users/michaeleight/.docker/run/docker.sock act -j frontend
 ```
+
+## Kubernetes Deployment
+
+### Prerequisites
+
+- Docker Desktop running
+- Minikube installed
+- Helm installed
+
+### Quick Start
+
+1. **Start Minikube:**
+
+```bash
+minikube start
+```
+
+2. **Load Docker images into Minikube** (for local testing):
+
+```bash
+minikube image load ghcr.io/michaeleight/wuda-backend:fix-readiness
+minikube image load ghcr.io/michaeleight/wuda-frontend:latest
+```
+
+3. **Deploy with Helm:**
+
+```bash
+helm install wuda ./helm/wuda
+```
+
+4. **Wait for pods to be ready:**
+
+```bash
+kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=wuda --timeout=30s
+```
+
+5. **Access the frontend:**
+
+```bash
+minikube service wuda-frontend --url
+```
+
+Keep the terminal open and visit the displayed URL (e.g., `http://127.0.0.1:xxxxx`)
+
+### Verify Deployment
+
+```bash
+# Check all pods are running
+kubectl get pods
+
+# Check services
+kubectl get services
+
+# View backend logs
+kubectl logs -l app.kubernetes.io/component=backend
+
+# View database logs
+kubectl logs -l app.kubernetes.io/component=database
+```
+
+### Update Deployment
+
+```bash
+helm upgrade wuda ./helm/wuda
+```
+
+### Cleanup
+
+```bash
+helm uninstall wuda
+minikube stop
+```
+
+### Known Issues & Fixes
+
+**Issue: Backend readiness probe failing (503)**
+
+- **Cause:** SQLAlchemy 2.x requires `text()` wrapper for raw SQL queries
+- **Fix:** Updated `back-end/database.py:22` to use `session.execute(text("SELECT 1"))`
+- **Image:** Use `ghcr.io/michaeleight/wuda-backend:fix-readiness`
